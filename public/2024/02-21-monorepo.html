@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Generated from statiq do not edit -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gift Better Blog</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+  
+  <body class="post">
+    <div class="py-24 sm:py-32">
+      <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="mx-auto max-w-2xl lg:max-w-4xl">
+          <img src="/images/banner4.png" alt="Gift Better Banner">
+          <h2 class="mt-10 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">The Monorepo</h2>
+          <div class="mt-10 space-y-4">
+            <p>
+Gift Better is building its platform using one source
+of truth on a large mono-repo.  </p>
+<p>
+Here’s our approach.</p>
+<p>
+The code is organized in a boring manner</p>
+<pre><code>/ docs
+/ libs
+/ tools
+/ [app]*
+/ README.md</code></pre>
+<h3>
+Docs</h3>
+<p>
+We keep all technical documentation directly within
+the code, so that when the code changes we can 
+keep the documentation up-to-date.</p>
+<h3>
+Libs</h3>
+<p>
+Our code base is <a href="https://elixir-lang.org">elixir</a>
+but our various <code class="inline">[app]*</code> will rely on common code
+that we manage in separate libraries.</p>
+<pre><code>{:kore, path: &quot;../libs/kore&quot;},
+{:salesforce, path: &quot;../libs/salesforce&quot;},</code></pre>
+<p>
+All catchall re-usable code goes into <code class="inline">kore</code>.</p>
+<p>
+We also, as much as possible, generate documentation
+from raw sources</p>
+<pre><code>- gencode # builds out certain parts of the system
+- gendata # (re)generates core gifting data
+- gendocs # (re)generates our documentation
+- deploy  # deploys an [app] to production
+- setup   # help setup developer environment </code></pre>
+<p>
+Our tools focus on global scripts to generate things
+(code, data, docs), deploy applications and help setup
+developerment environments.</p>
+<h2>
+Some justifications</h2>
+<p>
+There is a separation between the organization of your code
+and its deployment.  This can be split along both axes.</p>
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left;">
+      </th>
+      <th style="text-align: left;">
+1 deploy      </th>
+      <th style="text-align: left;">
+N deploys      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left;">
+1 repo      </td>
+      <td style="text-align: left;">
+Monolith      </td>
+      <td style="text-align: left;">
+Monorepo      </td>
+    </tr>
+    <tr>
+      <td style="text-align: left;">
+N repos      </td>
+      <td style="text-align: left;">
+Microlith      </td>
+      <td style="text-align: left;">
+SOA (Service Oriented)      </td>
+    </tr>
+  </tbody>
+</table>
+<p>
+Many conflate <code class="inline">1 repo</code> and the <code class="inline">Monolith</code>, as you can (and we do)
+serve up many applications (aka N deploys) from the one repository.
+And, the ability to keep code decoupled might <em>seem</em> easier within
+N repos, it is more about having a <em>good design</em> that clearly
+demarks responbility between entities.</p>
+<p>
+I have also seen many projects that think they are <code class="inline">service oriented</code>,
+in that they have N repos (one per service).  In reality though,
+those services are tightly coupled and typically <strong>must</strong> be
+deployed <em>together</em> resulting in what I am calling a <code class="inline">Microlith</code>.</p>
+<p>
+In 2016, Google (Rachel Potvin and Josh Levenberg) publisehd <a href="https://research.google/pubs/why-google-stores-billions-of-lines-of-code-in-a-single-repository/">“Why Google Stores Billions of Lines of Code in a Single Repository”</a>
+in the ACM giving a good overview of their code structure.</p>
+<p>
+Our team has decided on the <code class="inline">Monorepo</code> (1 repo N deploys) for a two key reasons</p>
+<ul>
+  <li>
+Simpler  </li>
+  <li>
+More malleable  </li>
+</ul>
+<p>
+Having one repository is far simpler than tracking multiple
+repos including </p>
+<p>
+a. Simpler access for development (aka clone one repo
+not several)
+b. Simpler access to re-usable code (aka no need for git submodules,
+a package deployments)
+c. Consistency between development environments (aka scripts can 
+know exactly where all the code resides)</p>
+<p>
+But, our code base is also more malleable</p>
+<p>
+a. We can extract common code into libraries <em>at any time</em> and apply
+the changes within one pull-request
+b. We can easily <strong>refactor</strong> code with <em>copy and replace</em> (again
+applying all changes within one pull-request)
+c. We can easily <em>restructure</em> the code should a <strong>better</strong> directory
+structure <em>emerge</em> as the code evolves.</p>
+<p>
+As the project evolves, so too can our code structure.</p>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+
+
+</html>
