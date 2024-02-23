@@ -13,7 +13,7 @@
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
         <div class="mx-auto max-w-2xl lg:max-w-4xl">
           <img src="/images/banner4.png" alt="Gift Better Banner">
-          <h2 class="mt-10 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">The Monorepo</h2>
+          <h1 class="mt-10 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">The Monorepo</h1>
           <div class="mt-10 space-y-4">
             <p>
 Gift Better is building its platform using one source
@@ -25,8 +25,7 @@ The code is organized in a boring manner</p>
 <pre><code>/ docs
 / libs
 / tools
-/ [app]*
-/ README.md</code></pre>
+/ [app]*</code></pre>
 <h3>
 Docs</h3>
 <p>
@@ -43,53 +42,77 @@ that we manage in separate libraries.</p>
 {:salesforce, path: &quot;../libs/salesforce&quot;},</code></pre>
 <p>
 All catchall re-usable code goes into <code class="inline">kore</code>.</p>
+<h3>
+Tools</h3>
 <p>
-We also, as much as possible, generate documentation
-from raw sources</p>
+Most scripts are managed in our <code class="inline">tools</code> directory.
+The primary scripts include</p>
 <pre><code>- gencode # builds out certain parts of the system
 - gendata # (re)generates core gifting data
 - gendocs # (re)generates our documentation
 - deploy  # deploys an [app] to production
 - setup   # help setup developer environment </code></pre>
 <p>
-Our tools focus on global scripts to generate things
-(code, data, docs), deploy applications and help setup
-developerment environments.</p>
+There nice cohesion to keep these scripts together
+with a, for example, consistent way to deploy our
+apps with</p>
+<pre><code>./tools/deploy giftdb
+./tools/deploy gbideas
+#./tools/deploy blog</code></pre>
+<p>
+We also want to de-couple from specific CI/CD
+vendor lock in. For example, our GitHub Actions 
+build script can be run (and more importantly tested/debugged)
+outside of GitHub; by delegating to our pipeline scripts.</p>
+<pre><code>- name: Setup Projects
+  run: ./tools/pipeline/setup
+
+- name: Run tests
+  run: ./tools/pipeline/tests</code></pre>
+<h3>
+One directory per [app]</h3>
+<p>
+Each <em>deployable</em> application is (currently) at the root 
+of the project. Presently, we have three applications</p>
+<ul>
+  <li>
+giftdb (our main gifting platform)  </li>
+  <li>
+gbideas (our AI/ML corporategiftbot.com service)  </li>
+  <li>
+blog (this blog, a simple static site published to GitHub Pages)  </li>
+</ul>
 <h2>
-Some justifications</h2>
+Why, Why, Why?</h2>
+<p>
+A little bit of thinking behind our <code class="inline">monorepo</code> architecture.</p>
+<h3>
+Monorepo isn’t that uncommon</h3>
 <p>
 There is a separation between the organization of your code
 and its deployment.  This can be split along both axes.</p>
-<table>
-  <thead>
-    <tr>
-      <th style="text-align: left;">
-      </th>
-      <th style="text-align: left;">
-1 deploy      </th>
-      <th style="text-align: left;">
-N deploys      </th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align: left;">
-1 repo      </td>
-      <td style="text-align: left;">
-Monolith      </td>
-      <td style="text-align: left;">
-Monorepo      </td>
-    </tr>
-    <tr>
-      <td style="text-align: left;">
-N repos      </td>
-      <td style="text-align: left;">
-Microlith      </td>
-      <td style="text-align: left;">
-SOA (Service Oriented)      </td>
-    </tr>
-  </tbody>
-</table>
+<div class="mx-auto max-w-3xl">
+    <table class="mx-auto divide-y divide-gray-300 text-center">
+    <thead>
+      <tr>
+        <th class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"></th>
+        <td class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">1 deploy</td>
+        <td class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">N deploys</td>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-200">
+      <tr>
+        <th class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">1 repo</th>
+        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Monolith</td>
+        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Monorepo</td>
+      </tr>
+      <tr>
+        <th class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">N repos</th>
+        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Microlith
+        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">SOA (Service Oriented)</td>
+      </tr>
+    </tbody>
+  </table></div>
 <p>
 Many conflate <code class="inline">1 repo</code> and the <code class="inline">Monolith</code>, as you can (and we do)
 serve up many applications (aka N deploys) from the one repository.
@@ -133,6 +156,19 @@ c. We can easily <em>restructure</em> the code should a <strong>better</strong> 
 structure <em>emerge</em> as the code evolves.</p>
 <p>
 As the project evolves, so too can our code structure.</p>
+<h3>
+Keeping it simple with a monorepo</h3>
+<p>
+(John) <a href="http://principles-wiki.net/principles:gall_s_law">Gall’s Law</a> posits</p>
+<blockquote>
+  A complex system that works is invariably found to have 
+evolved from a simple system that worked. The inverse 
+proposition also appears to be true: A complex system designed 
+from scratch never works and cannot be made to work. 
+You have to start over, beginning with a working simple system.</blockquote>
+<p>
+As such, we wanted to start simple and then evolve it based on
+actual needs, not assumed one.</p>
 
           </div>
         </div>
